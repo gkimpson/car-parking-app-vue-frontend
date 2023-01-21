@@ -14,11 +14,6 @@
     <button class="btn" @click="logout()">Logout</button>
   </div>
 
-  <!-- <div v-for="post in posts" v-bind:key="post.id">
-      <h2>{{ post.title }}</h2>
-      <p>{{ post.body }}</p>
-  </div> -->
-
   <div v-if="visibleDiv === 'vehicles'">
     <div v-for="vehicle in vehicles" v-bind:key="vehicle.id">
         <p>{{ vehicle.reg_number }}</p>
@@ -31,8 +26,6 @@
         <p>£{{ zone.price_per_hour }} p/hr</p>
     </div>
   </div>
-
-
   </template>
   
   <script>
@@ -43,7 +36,6 @@
     data() {
       return {
         isLoggedIn: localStorage.getItem('access_token'),
-        posts: [],
         vehicles: [],
         zones: [],
         visibleDiv: null,
@@ -53,20 +45,6 @@
       this.isLoggedIn = localStorage.getItem('access_token')
     },    
     methods: {
-      async getData() {
-          try {
-            axios.get('http://jsonplaceholder.typicode.com/posts', {})
-          .then(response => {
-            this.posts = response.data
-          })
-          .catch(error => {
-          console.log('error: ' + error.response);
-        })            
-
-          } catch (error) {
-            console.log(error);
-          }
-      }, 
       reloadPage() {
         window.location.reload();
       },  
@@ -76,7 +54,6 @@
           password: this.password
         })
         .then(response => {
-          console.log('response: ' + response);
           const access_token = response.data.access_token;
           localStorage.setItem('access_token', access_token);
           setAuthHeader(access_token); // set token to all subsequent requests
@@ -84,7 +61,6 @@
           // this.$router.push({ path: '/dashboard' })
         })
         .catch(error => {
-          // handle login error
           console.log('error: ' + error.response);
         })
       },
@@ -97,7 +73,7 @@
           })
           .catch(error => {
 
-        })
+          })
       },
 
       async getProfile() {
@@ -107,9 +83,8 @@
             this.visibleDiv = 'profile';
           })
           .catch(error => {
-          // handle login error
-          console.log('error: ' + error.response);
-        })
+            console.log('error: ' + error.response);
+          })
       },      
 
       async getParkings() {
@@ -142,7 +117,7 @@
       },
     },
     created() {
-      // this.getData();
+
     },    
   }
   </script>
