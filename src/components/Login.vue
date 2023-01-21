@@ -10,8 +10,29 @@
   <div v-if="isLoggedIn">
     <button class="btn" @click="getZones()">Zones</button>
     <button class="btn" @click="getProfile()">Profile</button>
+    <button class="btn" @click="getVehicles()">Vehicles</button>
     <button class="btn" @click="logout()">Logout</button>
   </div>
+
+  <!-- <div v-for="post in posts" v-bind:key="post.id">
+      <h2>{{ post.title }}</h2>
+      <p>{{ post.body }}</p>
+  </div> -->
+
+  <div v-if="visibleDiv === 'vehicles'">
+    <div v-for="vehicle in vehicles" v-bind:key="vehicle.id">
+        <p>{{ vehicle.reg_number }}</p>
+    </div>
+  </div>
+
+  <div v-if="visibleDiv === 'zones'">
+    <div v-for="zone in zones" v-bind:key="zone.id">
+        <h2>{{ zone.name }}</h2>
+        <p>£{{ zone.price_per_hour }} p/hr</p>
+    </div>
+  </div>
+
+
   </template>
   
   <script>
@@ -21,19 +42,35 @@
   export default {
     data() {
       return {
-        isLoggedIn: localStorage.getItem('access_token')
+        isLoggedIn: localStorage.getItem('access_token'),
+        posts: [],
+        vehicles: [],
+        zones: [],
+        visibleDiv: null,
       }
-    },    
+    },
     mounted() {
-      this.isLoggedIn = localStorage.getItem('access_token');
-      console.log('mounted login' + this.isLoggedIn);
-
+      this.isLoggedIn = localStorage.getItem('access_token')
     },    
     methods: {
+      async getData() {
+          try {
+            axios.get('http://jsonplaceholder.typicode.com/posts', {})
+          .then(response => {
+            this.posts = response.data
+          })
+          .catch(error => {
+          console.log('error: ' + error.response);
+        })            
+
+          } catch (error) {
+            console.log(error);
+          }
+      }, 
       reloadPage() {
         window.location.reload();
       },  
-      login() {
+      async login() {
         axios.post('https://car-parking-api.test/api/v1/auth/login', {
           email: this.email,
           password: this.password
@@ -52,21 +89,22 @@
         })
       },
 
-      getZones() {
+      async getZones() {
           axios.get('https://car-parking-api.test/api/v1/zones', {})
           .then(response => {
-            localStorage.getItem('access_token', access_token);
-            console.log(response);
+            this.zones = response.data.data;
+            this.visibleDiv = 'zones';
           })
           .catch(error => {
-          console.log('error: ' + error.response);
+
         })
       },
 
-      getProfile() {
+      async getProfile() {
           axios.get('https://car-parking-api.test/api/v1/profile', {})
           .then(response => {
-            console.log(response);
+            this.profile = response.data.data;
+            this.visibleDiv = 'profile';
           })
           .catch(error => {
           // handle login error
@@ -74,14 +112,23 @@
         })
       },      
 
-      getParkings() {
+      async getParkings() {
 
       },
-      getVehicles() {
-        
-      },
 
-      logout() {
+      async getVehicles() {
+        axios.get('https://car-parking-api.test/api/v1/vehicles', {
+        })
+        .then(response => {
+          this.vehicles = response.data.data;
+          this.visibleDiv = 'vehicles';
+        })
+        .catch(error => {
+          console.log('error: ' + error.response);
+        })
+      },      
+
+      async logout() {
         axios.post('https://car-parking-api.test/api/v1/auth/logout', {
         })
         .then(response => {
@@ -93,7 +140,10 @@
           console.log('error: ' + error.response);
         })
       },
-    }
+    },
+    created() {
+      // this.getData();
+    },    
   }
   </script>
   
